@@ -7,6 +7,7 @@ import gymnasium as gym
 import numpy as np
 import imageio
 import ale_py
+import cv2
 
 # Cargar variables de entorno desde .env
 try:
@@ -75,6 +76,7 @@ def run_episode(env, policy:Policy) -> int:
             total_reward (int): Recompensa total obtenida durante el episodio.
     """
     # Inicializar el entorno y variables del episodio
+    print("[INFO] Reiniciando entorno Galaxian...")
     observation, info = env.reset(seed=get_seed())
     frames: list[np.ndarray] = []
     total_reward = 0.0
@@ -87,6 +89,7 @@ def run_episode(env, policy:Policy) -> int:
         frames.append(observation.astype(np.uint8))
     
     # Ejecutar el episodio
+    print("[INFO] Iniciando episodio...")
     while not (terminated or truncated):
         # Tomar acción de la política
         action = int(policy(observation, info, env.action_space))
@@ -100,27 +103,37 @@ def run_episode(env, policy:Policy) -> int:
         total_reward += reward
         steps += 1
 
+        if steps % 500 == 0:  # cada 500 pasos muestra avance
+            print(f"  - Progreso: {steps} pasos, recompensa parcial = {total_reward:.0f}")
+        
         # Almacenar frame
         if isinstance(observation, np.ndarray):
             frames.append(observation.astype(np.uint8))
-    
+
+    print(f"[INFO] Episodio finalizado. Pasos: {steps}, Recompensa total: {total_reward:.0f}")
     return frames, int(round(total_reward))
 
 # ---------- Grabación del Episodio ----------
-def save_video(frames: list[np.ndarray], output_path: Path, fps: int = 30) -> None:
+def save_video(frames: list[np.ndarray], output_path: Path, fps: int = 30, scale: float = 2.0) -> None:
     """
     Guardar una lista de frames como un archivo de video MP4.
     Args:
         frames (list of np.ndarray): Lista de frames a guardar.
         output_path (Path): Ruta del archivo de salida.
         fps (int): Fotogramas por segundo del video.
+        scale (float): Factor de escala para redimensionar los frames.
     """
+    print(f"[INFO] Guardando video ({len(frames)} frames, escala x{scale})...")
     # Asegurarse de que el directorio de salida exista
     output_path.parent.mkdir(parents=True, exist_ok=True)
     # Guardar video usando imageio
     with imageio.get_writer(output_path, fps=fps, codec='libx264', quality=8,  macro_block_size=1) as video_writer:
         for frame in frames:
+            if scale != 1.0:
+                height, width = frame.shape[:2]
+                frame = cv2.resize(frame, (int(width * scale), int(height * scale)), interpolation=cv2.INTER_LINEAR)
             video_writer.append_data(frame)
+    print(f"[INFO] Video guardado en: {output_path}")
 
 # ---------- Función Principal ----------
 def record_episode(policy:Policy) -> None:
@@ -132,6 +145,7 @@ def record_episode(policy:Policy) -> None:
         Path: Ruta del video guardado.
     """
     # Configuraciones desde variables de entorno
+    print("[INFO] Iniciando grabación de episodio...")
     email = get_email()
     timestamp = get_timestamp()
     video_dir = os.getenv("VIDEO_DIR", "videos")
@@ -142,8 +156,9 @@ def record_episode(policy:Policy) -> None:
     output_path.mkdir(parents=True, exist_ok=True)
     
     # Crear entorno
+    print("[INFO] Creando entorno ALE/Galaxian-v5...")
     galaxian = gym.make('ALE/Galaxian-v5', render_mode='rgb_array')
-
+    
     # Ejecutar episodio
     try:
         frames, score = run_episode(galaxian, policy)
@@ -164,5 +179,3 @@ if __name__ == "__main__":
     
     # Grabar episodio
     video_path = record_episode(policy)
-    
-    print(f"Video guardado en: {video_path}")
