@@ -5,7 +5,7 @@ from typing import Protocol, Optional
 from pathlib import Path
 import gymnasium as gym
 import numpy as np
-import imageio
+import imageio.v2 as imageio
 import ale_py
 import cv2
 
@@ -33,11 +33,11 @@ def get_email() -> str:
     
 def get_timestamp() -> str:
     """
-    Obtener la marca de tiempo actual en formato YYYYMMDDHHMMSS.
+    Obtener la marca de tiempo actual en formato YYYYMMDDHHMM.
     Returns:
         str: Marca de tiempo actual como cadena.
     """
-    return datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+    return datetime.datetime.now().strftime("%Y%m%d%H%M")
 
 def get_seed() -> Optional[int]:
     """
