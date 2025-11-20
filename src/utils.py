@@ -1,5 +1,8 @@
 import os
 import datetime
+import random
+import numpy as np
+import torch
 from typing import Optional
 from dotenv import load_dotenv
 
@@ -39,6 +42,24 @@ def get_seed() -> Optional[int]:
     """
     seed = os.getenv("GALAXIAN_SEED").strip()
     return int(seed) if seed.isdigit() else None
+
+def set_global_seed(seed: int):
+    """
+    Fijar la semilla global para random, numpy y torch.
+    Args:
+        seed (int): La semilla a fijar.
+    """
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed(seed)
+        torch.cuda.manual_seed_all(seed)
+
+    # Algunas medidas adicionales para reproducibilidad absoluta en torch
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
 
 def get_video_dir(default: str = "videos") -> str:
     """
