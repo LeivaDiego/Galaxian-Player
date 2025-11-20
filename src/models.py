@@ -4,6 +4,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+# Modelos DQN y Dueling DQN basados en la arquitectura de Nature 2015 y Wang et al. 2016.
+# https://share.google/T5g7nQgdUJUHplr9H
 
 def conv_out_size(h: int, w: int) -> Tuple[int, int]:
     """
