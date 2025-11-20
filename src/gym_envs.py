@@ -2,7 +2,9 @@ import gymnasium as gym
 import ale_py
 from gymnasium.wrappers import AtariPreprocessing, FrameStackObservation
 
+# Registrar los entornos de ALE en Gymnasium
 gym.register_envs(ale_py)
+
 
 def make_galaxian_env(
     render_mode: str | None = None,
@@ -18,8 +20,6 @@ def make_galaxian_env(
     Returns:
         gym.Env: Entorno de Gymnasium configurado para Galaxian.
     """
-    
-
     if deepmind_wrappers:
         # Crear entorno base
         env = gym.make(
