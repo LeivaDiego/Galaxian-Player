@@ -136,11 +136,13 @@ def save_video(frames: list[np.ndarray], output_path: Path, fps: int = 30, scale
     print(f"[INFO] Video guardado en: {output_path}")
 
 # ---------- Función Principal ----------
-def record_episode(policy:Policy) -> None:
+def record_episode(policy:Policy, video_dir:Optional[str]=None) -> None:
     """
     Grabar un episodio completo utilizando la política proporcionada.
     Args:
         policy (Policy): Política para seleccionar acciones.
+        video_dir (Optional[str]): Directorio donde guardar el video. 
+        Si es None, se usa la variable de entorno VIDEO_DIR o "videos".
     Returns:
         Path: Ruta del video guardado.
     """
@@ -148,7 +150,8 @@ def record_episode(policy:Policy) -> None:
     print("[INFO] Iniciando grabación de episodio...")
     email = get_email()
     timestamp = get_timestamp()
-    video_dir = os.getenv("VIDEO_DIR", "videos")
+    env_video_dir = os.getenv("VIDEO_DIR", "videos")
+    video_dir = video_dir if video_dir is not None else env_video_dir
     video_fps = int(os.getenv("VIDEO_FPS", "30"))
     
     # Preparar ruta de salida
