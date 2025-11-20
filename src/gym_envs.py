@@ -1,6 +1,6 @@
 import gymnasium as gym
 import ale_py
-from gymnasium.wrappers import AtariPreprocessing, FrameStack
+from gymnasium.wrappers import AtariPreprocessing, FrameStackObservation
 
 gym.register_envs(ale_py)
 
@@ -18,15 +18,32 @@ def make_galaxian_env(
     Returns:
         gym.Env: Entorno de Gymnasium configurado para Galaxian.
     """
-    env = gym.make("ALE/Galaxian-v5", render_mode=render_mode)
+    
 
     if deepmind_wrappers:
+        # Crear entorno base
+        env = gym.make(
+            "ALE/Galaxian-v5", 
+            render_mode=render_mode, 
+            frameskip=1
+        )
+        # Aplicar wrappers de DeepMind
         env = AtariPreprocessing(
             env,
             grayscale_obs=True,
             frame_skip=4,
             screen_size=84,
         )
-        env = FrameStack(env, frame_stack)
+        # Apilar frames
+        env = FrameStackObservation(
+            env=env, 
+            stack_size=frame_stack
+        )
+    else:
+        # Crear entorno sin preprocesamiento adicional
+        env = gym.make(
+            "ALE/Galaxian-v5", 
+            render_mode=render_mode
+        )
 
     return env

@@ -80,7 +80,7 @@ def run_episode(env, policy:Policy) -> int:
 
 
 # ---------- Grabación del Episodio ----------
-def save_video(frames: List[np.ndarray], output_path: Path, fps: int = 30, scale: float = 2.0) -> None:
+def save_video(frames: List[np.ndarray], output_path: Path, fps: int = 30, scale: float = 1.0) -> None:
     """
     Guardar una lista de frames como un archivo de video MP4.
     Args:
