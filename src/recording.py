@@ -104,7 +104,7 @@ def save_video(frames: List[np.ndarray], output_path: Path, fps: int = 30, scale
 
 
 # ---------- Función Principal ----------
-def record_episode(policy:Policy, deepmind_wrappers: bool = False, video_dir:Optional[str]=None) -> None:
+def record_episode(policy:Policy, deepmind_wrappers: bool = False, video_dir:Optional[str]=None, video_name: Optional[str]=None) -> None:
     """
     Grabar un episodio completo utilizando la política proporcionada.
     Args:
@@ -141,7 +141,10 @@ def record_episode(policy:Policy, deepmind_wrappers: bool = False, video_dir:Opt
         galaxian.close()
 
     # Guardar video
-    video_filename = f"{email}_{timestamp}_{score}.mp4"
+    if video_name is not None:
+        video_filename = video_name
+    else:
+        video_filename = f"{email}_{timestamp}_{score}.mp4"
     output_path = Path (video_dir) / video_filename
     save_video(frames, output_path, fps=video_fps)
     
